@@ -36,5 +36,7 @@ namespace Nrun.Users.Dto
         public DateTime CreationTime { get; set; }
 
         public string[] RoleNames { get; set; }
+        
+        public string Image { get; set; }
     }
 }

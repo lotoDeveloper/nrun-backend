@@ -61,5 +61,12 @@ namespace Nrun.Profile
         /// <returns></returns>
         Task<List<UserDto>> GetFollowings(EntityDto<long> input);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        Task<string> Upload(IFormFile file);
+
     }
 }

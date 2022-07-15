@@ -6,6 +6,6 @@ namespace Nrun.Post.Dto
     {
         public string Text { get; set; }
 
-        public IFormFile ImageFile { get; set; }
+        public string Image { get; set; }
     }
 }

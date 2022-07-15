@@ -17,8 +17,7 @@ namespace Nrun.Post
         private readonly IRepository<Domain.Post, long> _postRepository;
         private readonly IRepository<Like, long> _likeRepository;
         private readonly IRepository<Comment, long> _commentRepository;
-
-
+        
         public PostAppService(IRepository<Domain.Post, long> postRepository, IRepository<Like, long> likeRepository,
             IRepository<Comment, long> commentRepository)
         {
@@ -29,12 +28,9 @@ namespace Nrun.Post
 
         public async Task CreatePost(CreatePostInput input)
         {
-            // upload 
-            string link = "";
-
             await _postRepository.InsertAsync(new Domain.Post()
             {
-                Image = link,
+                Image = input.Image,
                 Text = input.Text
             });
 

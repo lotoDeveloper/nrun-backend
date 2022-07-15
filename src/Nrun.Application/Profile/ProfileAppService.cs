@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.Application.Services.Dto;
+using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nrun.Authorization.Users;
 using Nrun.Domain;
@@ -13,6 +15,7 @@ using Nrun.Users.Dto;
 
 namespace Nrun.Profile
 {
+    [AbpAuthorize()]
     public class ProfileAppService : NrunAppServiceBase, IProfileAppService
     {
         private readonly IRepository<User, long> _userRepository;
@@ -104,6 +107,12 @@ namespace Nrun.Profile
             var users = await _followRepository.GetAll().Where(x => x.CreatorUserId == input.Id)
                 .ToListAsync();
             return ObjectMapper.Map<List<UserDto>>(users);
+        }
+
+        [HttpPut]
+        public async Task<string> Upload(IFormFile file)
+        {
+            return "";
         }
     }
 }

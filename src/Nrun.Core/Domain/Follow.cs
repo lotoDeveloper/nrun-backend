@@ -10,6 +10,6 @@ namespace Nrun.Domain
 
         public long TargetUserId { get; set; }
 
-        [ForeignKey(nameof(CreatorUserId))] public User TargetUser { get; set; }
+        [ForeignKey(nameof(TargetUserId))] public User TargetUser { get; set; }
     }
 }
