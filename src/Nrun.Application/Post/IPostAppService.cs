@@ -41,6 +41,13 @@ namespace Nrun.Post
         /// </summary>
         /// <param name="input">post id</param>
         /// <returns></returns>
-        Task LikePost(LikeInput input); 
+        Task LikePost(LikeInput input);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task CommentToPost(CommentInput input);
     }
 }

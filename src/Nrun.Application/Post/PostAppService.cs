@@ -16,12 +16,15 @@ namespace Nrun.Post
     {
         private readonly IRepository<Domain.Post, long> _postRepository;
         private readonly IRepository<Like, long> _likeRepository;
+        private readonly IRepository<Comment, long> _commentRepository;
 
 
-        public PostAppService(IRepository<Domain.Post, long> postRepository, IRepository<Like, long> likeRepository)
+        public PostAppService(IRepository<Domain.Post, long> postRepository, IRepository<Like, long> likeRepository,
+            IRepository<Comment, long> commentRepository)
         {
             _postRepository = postRepository;
             _likeRepository = likeRepository;
+            _commentRepository = commentRepository;
         }
 
         public async Task CreatePost(CreatePostInput input)
@@ -67,7 +70,7 @@ namespace Nrun.Post
             {
                 mappedResult.IsLikeedByCurrentUser = true;
             }
-            
+
             return ObjectMapper.Map<PostDto>(post);
         }
 
@@ -78,6 +81,8 @@ namespace Nrun.Post
                 .Where(x => x.CreatorUserId == input.Id)
                 .Include(x => x.CreatorUser)
                 .Include(x => x.Likes)
+                .Include(x => x.Comments)
+                .ThenInclude(x => x.CreatorUser)
                 .ToListAsync();
 
             var mappedResult = ObjectMapper.Map<List<PostDto>>(posts);
@@ -111,6 +116,17 @@ namespace Nrun.Post
             {
                 await _likeRepository.DeleteAsync(exist);
             }
+        }
+
+        public async Task CommentToPost(CommentInput input)
+        {
+            await _commentRepository.InsertAsync(new Comment()
+            {
+                PostId = input.PostId,
+                Text = input.Text
+            });
+
+            await CurrentUnitOfWork.SaveChangesAsync();
         }
     }
 }

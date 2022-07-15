@@ -14,8 +14,9 @@ namespace Nrun.Domain
         public string Image { get; set; }
 
         [ForeignKey(nameof(CreatorUserId))] public User CreatorUser { get; set; }
-        
+
         public virtual ICollection<Like> Likes { get; set; }
 
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }

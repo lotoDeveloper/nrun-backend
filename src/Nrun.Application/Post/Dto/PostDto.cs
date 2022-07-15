@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Entities.Auditing;
+using Nrun.Domain;
 using Nrun.Users.Dto;
 
 namespace Nrun.Post.Dto
@@ -18,5 +20,8 @@ namespace Nrun.Post.Dto
         public int LikeCount { get; set; }
 
         public bool IsLikeedByCurrentUser { get; set; }
+
+        public List<CommentDto> Comments { get; set; }
+        
     }
 }
