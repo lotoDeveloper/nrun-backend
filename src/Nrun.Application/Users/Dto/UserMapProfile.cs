@@ -3,7 +3,7 @@ using Nrun.Authorization.Users;
 
 namespace Nrun.Users.Dto
 {
-    public class UserMapProfile : Profile
+    public class UserMapProfile : AutoMapper.Profile
     {
         public UserMapProfile()
         {

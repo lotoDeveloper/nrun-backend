@@ -6,7 +6,7 @@ using Nrun.Authorization.Roles;
 
 namespace Nrun.Roles.Dto
 {
-    public class RoleMapProfile : Profile
+    public class RoleMapProfile : AutoMapper.Profile
     {
         public RoleMapProfile()
         {
