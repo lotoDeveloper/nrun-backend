@@ -17,13 +17,16 @@ namespace Nrun.Post
         private readonly IRepository<Domain.Post, long> _postRepository;
         private readonly IRepository<Like, long> _likeRepository;
         private readonly IRepository<Comment, long> _commentRepository;
-        
+        private readonly IRepository<Follow, long> _followRepository;
+
+
         public PostAppService(IRepository<Domain.Post, long> postRepository, IRepository<Like, long> likeRepository,
-            IRepository<Comment, long> commentRepository)
+            IRepository<Comment, long> commentRepository, IRepository<Follow, long> followRepository)
         {
             _postRepository = postRepository;
             _likeRepository = likeRepository;
             _commentRepository = commentRepository;
+            _followRepository = followRepository;
         }
 
         public async Task CreatePost(CreatePostInput input)
@@ -58,16 +61,18 @@ namespace Nrun.Post
                 .Where(x => x.Id == input.Id)
                 .Include(x => x.CreatorUser)
                 .Include(x => x.Likes)
+                .Include(x => x.Comments)
+                .ThenInclude(x=>x.CreatorUser)
                 .FirstOrDefaultAsync();
 
             var mappedResult = ObjectMapper.Map<PostDto>(post);
-            if (post.Likes
-                .Any(x => x.CreatorUserId == AbpSession.UserId.Value))
+            
+            if (post.Likes.Any(x => x.CreatorUserId == AbpSession.UserId.Value))
             {
-                mappedResult.IsLikeedByCurrentUser = true;
+                mappedResult.IsLikedByCurrentUser = true;
             }
 
-            return ObjectMapper.Map<PostDto>(post);
+            return mappedResult;
         }
 
         public async Task<List<PostDto>> GetPostByUserId(EntityDto<long> input)
@@ -77,7 +82,6 @@ namespace Nrun.Post
                 .Where(x => x.CreatorUserId == input.Id)
                 .Include(x => x.CreatorUser)
                 .Include(x => x.Likes)
-                .Include(x => x.Comments)
                 .ThenInclude(x => x.CreatorUser)
                 .ToListAsync();
 
@@ -88,7 +92,62 @@ namespace Nrun.Post
                 if (posts.FirstOrDefault(x => x.Id == item.Id).Likes
                     .Any(x => x.CreatorUserId == AbpSession.UserId.Value))
                 {
-                    item.IsLikeedByCurrentUser = true;
+                    item.IsLikedByCurrentUser = true;
+                }
+            }
+
+            return mappedResult;
+        }
+
+
+        public async Task<List<PostDto>> GetGlobalPosts(EntityDto<long> input)
+        {
+            var posts = await _postRepository
+                .GetAll()
+                .Include(x => x.CreatorUser)
+                .Include(x => x.Likes)
+                .Include(x => x.Comments)
+                .ThenInclude(x => x.CreatorUser)
+                .OrderByDescending(x => x.CreationTime)
+                .ToListAsync();
+
+            var mappedResult = ObjectMapper.Map<List<PostDto>>(posts);
+
+            foreach (var item in mappedResult)
+            {
+                if (posts.FirstOrDefault(x => x.Id == item.Id).Likes
+                    .Any(x => x.CreatorUserId == AbpSession.UserId.Value))
+                {
+                    item.IsLikedByCurrentUser = true;
+                }
+            }
+
+            return mappedResult;
+        }
+
+
+        public async Task<List<PostDto>> GetFollowingPosts(EntityDto<long> input)
+        {
+            var users = await _followRepository.GetAll().Where(x => x.CreatorUserId == input.Id).Select(x => x.Id)
+                .ToListAsync();
+
+            var posts = await _postRepository
+                .GetAll()
+                .Where(x => users.Contains(x.CreatorUserId.Value))
+                .Include(x => x.CreatorUser)
+                .Include(x => x.Likes)
+                .ThenInclude(x => x.CreatorUser)
+                .OrderByDescending(x => x.CreationTime)
+                .ToListAsync();
+
+            var mappedResult = ObjectMapper.Map<List<PostDto>>(posts);
+
+            foreach (var item in mappedResult)
+            {
+                if (posts.FirstOrDefault(x => x.Id == item.Id).Likes
+                    .Any(x => x.CreatorUserId == AbpSession.UserId.Value))
+                {
+                    item.IsLikedByCurrentUser = true;
                 }
             }
 

@@ -19,7 +19,7 @@ namespace Nrun.Post.Dto
 
         public int LikeCount { get; set; }
 
-        public bool IsLikeedByCurrentUser { get; set; }
+        public bool IsLikedByCurrentUser { get; set; }
 
         public List<CommentDto> Comments { get; set; }
         

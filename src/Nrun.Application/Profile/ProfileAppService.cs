@@ -1,12 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
+using Abp.IO.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Nrun.Authorization.Users;
 using Nrun.Domain;
 using Nrun.Post.Dto;
@@ -32,7 +38,9 @@ namespace Nrun.Profile
 
         public async Task UpdateProfile(ProfileInput input)
         {
-            await _userRepository.UpdateAsync(AbpSession.UserId.Value, async (x) => { x.Name = input.Name; });
+            await _userRepository.UpdateAsync(AbpSession.UserId.Value, async (x) => { x.Name = input.Name;
+                x.Image = input.Image;
+            });
 
             await CurrentUnitOfWork.SaveChangesAsync();
         }
@@ -112,7 +120,15 @@ namespace Nrun.Profile
         [HttpPut]
         public async Task<string> Upload(IFormFile file)
         {
-            return "";
+            using (var client = new HttpClient())
+            {
+                    byte[] fileBytes = file.OpenReadStream().GetAllBytes();
+                    var byteArrayContent = new ByteArrayContent(fileBytes);
+                    var url = "https://www.filestackapi.com/api/store/S3?key=Ai7nZU6Q5RAeF7hYGrJuSz";
+                    var result = await client.PostAsync(url, byteArrayContent);
+                    var g = JsonConvert.DeserializeObject<UploadModel>(await result.Content.ReadAsStringAsync()) ;
+                    return g.Url;
+            }
         }
     }
 }
